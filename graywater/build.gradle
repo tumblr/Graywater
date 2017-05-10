@@ -1,0 +1,42 @@
+apply plugin: 'com.android.library'
+apply plugin: 'checkstyle'
+
+android {
+    compileSdkVersion 25
+    buildToolsVersion '25.0.2'
+
+    defaultConfig {
+        minSdkVersion 16
+        targetSdkVersion 25
+        versionCode 1
+        versionName "1.0"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    testCompile 'junit:junit:4.12'
+    testCompile "org.robolectric:robolectric:3.1.4"
+    provided 'com.android.support:appcompat-v7:25.3.1'
+    provided 'com.android.support:recyclerview-v7:25.3.1'
+}
+
+checkstyle {
+    toolVersion = "6.7"
+}
+
+task checkstyle(type: Checkstyle) {
+    configFile = rootProject.file('graywater/checkstyle.xml')
+    configProperties = ['proj.module.dir': projectDir.absolutePath]
+    classpath = files()
+
+    source 'src/main/java'
+    include '**/*.java'
+    exclude '**/gen/**'
+}

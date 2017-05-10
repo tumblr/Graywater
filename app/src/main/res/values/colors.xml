@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<color name="colorPrimary">#3F51B5</color>
+	<color name="colorPrimaryDark">#303F9F</color>
+	<color name="colorAccent">#FF4081</color>
+
+	<color name="red_base_variant_0">#d85f46</color>
+	<color name="red_base_variant_1">#f94e27</color>
+	<color name="red_base_variant_2">#fd4347</color>
+	<color name="red_base_variant_3">#efc0b8</color>
+	<color name="red_base_variant_4">#fe7576</color>
+
+	<color name="yellow_base_variant_0">#f1993c</color>
+	<color name="yellow_base_variant_1">#ffd731</color>
+	<color name="yellow_base_variant_2">#fff148</color>
+	<color name="yellow_base_variant_3">#decba6</color>
+	<color name="yellow_base_variant_4">#e8ec75</color>
+
+	<color name="green_base_variant_0">#5bbc8c</color>
+	<color name="green_base_variant_1">#5bbe52</color>
+	<color name="green_base_variant_2">#60cdb4</color>
+	<color name="green_base_variant_3">#9dcaca</color>
+	<color name="green_base_variant_4">#c1e4ab</color>
+
+	<color name="blue_base_variant_0">#56a0cb</color>
+	<color name="blue_base_variant_0_50">#8056a0cb</color>
+	<color name="blue_base_variant_1">#60cae0</color>
+	<color name="blue_base_variant_2">#558bd9</color>
+	<color name="blue_base_variant_3">#3b4fc8</color>
+	<color name="blue_base_variant_4">#6158c2</color>
+
+	<color name="purple_base_variant_0">#a780c1</color>
+	<color name="purple_base_variant_1">#b09dd4</color>
+	<color name="purple_base_variant_2">#d86dc3</color>
+	<color name="purple_base_variant_3">#e1b8d2</color>
+	<color name="purple_base_variant_4">#fc4081</color>
+</resources>

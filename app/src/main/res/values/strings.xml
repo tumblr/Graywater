@@ -1,0 +1,4 @@
+<resources>
+	<string name="app_name">graywater</string>
+	<string name="header_text">This is a Header</string>
+</resources>
