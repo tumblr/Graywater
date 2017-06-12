@@ -4,7 +4,7 @@ Graywater is a [`RecyclerView`](https://developer.android.com/reference/android/
 
 The concept is based off of [Facebook's post on a faster news feed](https://code.facebook.com/posts/879498888759525/fast-rendering-news-feed-on-android/) and [Components for Android](https://code.facebook.com/posts/531104390396423/components-for-android-a-declarative-framework-for-efficient-uis/), which have been realized as [Litho](http://fblitho.com).
 
-Tumblr developed Graywater to improve scoll performance, reduce memory usage, and lay the foundation for a more modular codebase.
+Tumblr developed Graywater to improve scroll performance, reduce memory usage, and lay the foundation for a more modular codebase.
 
 * [What is it?](#what-is-it)
 * [How do you use it?](#how-do-you-use-it)
@@ -379,7 +379,7 @@ return (VH) viewHolderCreatorMap.get(getViewHolderClass(viewType)).create(parent
 
 ## Other features
 
-In `bind()`, the adapter looks ahead to the next `numViewHoldersToPrepare()` viewholders (default 3) and calls `Binder.prepare()` on them. Note that it does not call `prepare()` more than once, unless `unbind()` is called. This state is stored in `viewHolderPreparedCache` which stores the indicies of viewholders that have been prepared.
+In `bind()`, the adapter looks ahead to the next `numViewHoldersToPrepare()` viewholders (default 3) and calls `Binder.prepare()` on them. Note that it does not call `prepare()` more than once, unless `unbind()` is called. This state is stored in `viewHolderPreparedCache` which stores the indices of viewholders that have been prepared.
 
 This also works in both directions of the `RecyclerView`. It checks the order of `bind()` operations to determine which direction to prepare viewholders in.
 
