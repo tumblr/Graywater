@@ -6,6 +6,8 @@ The concept is based off of [Facebook's post on a faster news feed](https://code
 
 Tumblr developed Graywater to improve scroll performance, reduce memory usage, and lay the foundation for a more modular codebase.
 
+The name "Graywater" comes from [the process of recycling water](https://en.wikipedia.org/wiki/Greywater).
+
 * [What is it?](#what-is-it)
 * [How do you use it?](#how-do-you-use-it)
 * [How does it work?](#how-does-it-work)
