@@ -15,8 +15,9 @@ import java.util.List;
 /**
  * Created by ericleong on 3/28/16.
  */
-public class PaletteItemBinder implements GraywaterAdapter.ItemBinder<Palette, PrimitiveViewHolder>,
-		GraywaterAdapter.ActionListener<Palette, PrimitiveViewHolder> {
+public class PaletteItemBinder implements GraywaterAdapter.ItemBinder<Palette, PrimitiveViewHolder,
+		GraywaterAdapter.Binder<Palette, PrimitiveViewHolder, ? extends PrimitiveViewHolder>>,
+		GraywaterAdapter.ActionListener<Palette, PrimitiveViewHolder, PrimitiveViewHolder> {
 	private final TextPrimitiveBinder<Palette> mPaletteTextPrimitiveBinder;
 	private final PaletteColorBinder mPaletteColorBinder;
 
@@ -27,9 +28,9 @@ public class PaletteItemBinder implements GraywaterAdapter.ItemBinder<Palette, P
 
 	@NonNull
 	@Override
-	public List<GraywaterAdapter.Binder<? super Palette, ? extends PrimitiveViewHolder>> getBinderList(
-			@NonNull final Palette model, final int position) {
-		return new ArrayList<GraywaterAdapter.Binder<? super Palette, ? extends PrimitiveViewHolder>>() {{
+	public List<GraywaterAdapter.Binder<Palette, PrimitiveViewHolder, ? extends PrimitiveViewHolder>>
+	getBinderList(@NonNull final Palette model, final int position) {
+		return new ArrayList<GraywaterAdapter.Binder<Palette, PrimitiveViewHolder, ? extends PrimitiveViewHolder>>() {{
 			add(mPaletteTextPrimitiveBinder);
 
 			for (int color : model.getColors()) {
@@ -42,7 +43,8 @@ public class PaletteItemBinder implements GraywaterAdapter.ItemBinder<Palette, P
 	public void act(@NonNull final Palette model,
 	                @NonNull final PrimitiveViewHolder holder,
 	                @NonNull final View v,
-	                @NonNull final List<GraywaterAdapter.Binder<? super Palette, ? extends PrimitiveViewHolder>> binders,
+	                @NonNull final List<GraywaterAdapter.Binder<
+			                ? super Palette, PrimitiveViewHolder, ? extends PrimitiveViewHolder>> binders,
 	                final int binderIndex,
 	                @Nullable final Object obj) {
 

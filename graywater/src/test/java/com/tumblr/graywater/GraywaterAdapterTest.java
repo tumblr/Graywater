@@ -16,13 +16,20 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
-/**
- * To work on unit tests, switch the Test Artifact in the Build Variants view.
- */
 @RunWith(RobolectricTestRunner.class)
 public class GraywaterAdapterTest {
 
-	private static class TestAdapter extends GraywaterAdapter<Object, RecyclerView.ViewHolder, Class<?>> {
+	private abstract static class TestBinder<U, V extends RecyclerView.ViewHolder, W extends V>
+			implements GraywaterAdapter.Binder<U, V, W> {
+
+	}
+
+	private static class TestAdapter
+			extends GraywaterAdapter<
+			Object,
+			RecyclerView.ViewHolder,
+			TestBinder<?, RecyclerView.ViewHolder, ? extends RecyclerView.ViewHolder>,
+			Class<?>> {
 
 		@Override
 		protected Class<?> getModelType(final Object model) {
@@ -41,20 +48,20 @@ public class GraywaterAdapterTest {
 		}
 
 		private static class TextViewHolder extends RecyclerView.ViewHolder {
-			public TextViewHolder(final View itemView) {
+			TextViewHolder(final View itemView) {
 				super(itemView);
 			}
 		}
 
 		private static class ImageViewHolder extends RecyclerView.ViewHolder {
-			public ImageViewHolder(final View itemView) {
+			ImageViewHolder(final View itemView) {
 				super(itemView);
 			}
 		}
 
 		private static class TextViewHolderCreator implements GraywaterAdapter.ViewHolderCreator {
 
-			public static final int VIEW_TYPE = 1;
+			static final int VIEW_TYPE = 1;
 
 			@Override
 			public TextViewHolder create(final ViewGroup parent) {
@@ -69,7 +76,7 @@ public class GraywaterAdapterTest {
 
 		private static class ImageViewHolderCreator implements GraywaterAdapter.ViewHolderCreator {
 
-			public static final int VIEW_TYPE = 2;
+			static final int VIEW_TYPE = 2;
 
 			@Override
 			public ImageViewHolder create(final ViewGroup parent) {
@@ -82,25 +89,26 @@ public class GraywaterAdapterTest {
 			}
 		}
 
-		private static class TextBinder implements Binder<String, TextViewHolder> {
+		private static class TextBinder extends TestBinder<String, RecyclerView.ViewHolder, TextViewHolder> {
 
-			@NonNull
 			@Override
-			public Class<TextViewHolder> getViewHolderType() {
-				return TextViewHolder.class;
+			public int getViewType(@NonNull final String model) {
+				return TextViewHolderCreator.VIEW_TYPE;
 			}
 
 			@Override
 			public void prepare(@NonNull final String model,
-			                    final List<Binder<? super String, ? extends TextViewHolder>> binderList, final int binderIndex) {
+			                    @NonNull final List<Binder<? super String, RecyclerView.ViewHolder, ? extends RecyclerView.ViewHolder>> binderList,
+			                    final int binderIndex) {
 
 			}
 
 			@Override
-			public void bind(@NonNull final String model, @NonNull final TextViewHolder holder,
-			                 @NonNull final List<Binder<? super String, ? extends TextViewHolder>> binders,
-			                 final int binderIndex,
-			                 @NonNull final ActionListener<String, TextViewHolder> actionListener) {
+			public void bind(@NonNull final String model,
+			                 @NonNull final TextViewHolder holder,
+			                 @NonNull final List<
+					                 Binder<? super String, RecyclerView.ViewHolder, ? extends RecyclerView.ViewHolder>> binders,
+			                 final int binderIndex, @NonNull final ActionListener<String, RecyclerView.ViewHolder, TextViewHolder> actionListener) {
 				((TextView) holder.itemView).setText(model);
 			}
 
@@ -110,16 +118,15 @@ public class GraywaterAdapterTest {
 			}
 		}
 
-		private static class ImageBinder implements Binder<Uri, ImageViewHolder> {
-			@NonNull
+		private static class ImageBinder extends TestBinder<Uri, RecyclerView.ViewHolder, ImageViewHolder> {
 			@Override
-			public Class<ImageViewHolder> getViewHolderType() {
-				return ImageViewHolder.class;
+			public int getViewType(@NonNull final Uri model) {
+				return ImageViewHolderCreator.VIEW_TYPE;
 			}
 
 			@Override
 			public void prepare(@NonNull final Uri model,
-			                    final List<Binder<? super Uri, ? extends ImageViewHolder>> binderList,
+			                    @NonNull final List<Binder<? super Uri, RecyclerView.ViewHolder, ? extends RecyclerView.ViewHolder>> binders,
 			                    final int binderIndex) {
 
 			}
@@ -127,9 +134,9 @@ public class GraywaterAdapterTest {
 			@Override
 			public void bind(@NonNull final Uri model,
 			                 @NonNull final ImageViewHolder holder,
-			                 @NonNull final List<Binder<? super Uri, ? extends ImageViewHolder>> binders,
+			                 @NonNull final List<Binder<? super Uri, RecyclerView.ViewHolder, ? extends RecyclerView.ViewHolder>> binders,
 			                 final int binderIndex,
-			                 @NonNull final ActionListener<Uri, ImageViewHolder> actionListener) {
+			                 @NonNull final ActionListener<Uri, RecyclerView.ViewHolder, ImageViewHolder> actionListener) {
 				((ImageView) holder.itemView).setImageURI(model); // not a good idea in production ;)
 			}
 
@@ -148,30 +155,38 @@ public class GraywaterAdapterTest {
 			final TextBinder textBinder = new TextBinder();
 			final ImageBinder imageBinder = new ImageBinder();
 
-			register(String.class, new ItemBinder<String, RecyclerView.ViewHolder>() {
-				@NonNull
-				@Override
-				public List<Binder<? super String, ? extends RecyclerView.ViewHolder>> getBinderList(@NonNull final String model,
-				                                                                                     final int position) {
-					return new ArrayList<Binder<? super String, ? extends RecyclerView.ViewHolder>>() {{
-						add(textBinder);
-						add(textBinder);
-					}};
-				}
-			}, null);
+			register(
+					String.class,
+					new ItemBinder<String, RecyclerView.ViewHolder,
+							TestBinder<String, RecyclerView.ViewHolder, ? extends RecyclerView.ViewHolder>>() {
+						@NonNull
+						@Override
+						public List<TestBinder<String, RecyclerView.ViewHolder, ? extends RecyclerView.ViewHolder>> getBinderList(
+								@NonNull final String model,
+								final int position) {
+							return new ArrayList<TestBinder<String, RecyclerView.ViewHolder, ? extends RecyclerView.ViewHolder>>() {{
+								add(textBinder);
+								add(textBinder);
+							}};
+						}
+					}, null);
 
-			register(Uri.class, new ItemBinder<Uri, RecyclerView.ViewHolder>() {
-				@NonNull
-				@Override
-				public List<Binder<? super Uri, ? extends RecyclerView.ViewHolder>> getBinderList(@NonNull final Uri model,
-				                                                                                  final int position) {
-					return new ArrayList<Binder<? super Uri, ? extends RecyclerView.ViewHolder>>() {{
-						add(imageBinder);
-						add(imageBinder);
-						add(imageBinder);
-					}};
-				}
-			}, null);
+			register(
+					Uri.class,
+					new ItemBinder<Uri, RecyclerView.ViewHolder,
+							TestBinder<Uri, RecyclerView.ViewHolder, ? extends RecyclerView.ViewHolder>>() {
+						@NonNull
+						@Override
+						public List<TestBinder<Uri, RecyclerView.ViewHolder, ? extends RecyclerView.ViewHolder>> getBinderList(
+								@NonNull final Uri model,
+								final int position) {
+							return new ArrayList<TestBinder<Uri, RecyclerView.ViewHolder, ? extends RecyclerView.ViewHolder>>() {{
+								add(imageBinder);
+								add(imageBinder);
+								add(imageBinder);
+							}};
+						}
+					}, null);
 		}
 	}
 
@@ -296,7 +311,7 @@ public class GraywaterAdapterTest {
 
 		adapter.remove(0);
 
-		adapter.add(0, "zero");
+		adapter.add(0, "zero", false);
 
 		// ["zero", "zero", "one", "one, ... ]
 		final GraywaterAdapter.BinderResult one = adapter.computeItemAndBinderIndex(2);
@@ -344,7 +359,7 @@ public class GraywaterAdapterTest {
 		final Object obj = adapter.remove(2);
 		assertEquals("two", obj);
 
-		adapter.add(2, "two");
+		adapter.add(2, "two", false);
 
 		// ["zero", "zero", "one", "one, ... ]
 		final GraywaterAdapter.BinderResult one = adapter.computeItemAndBinderIndex(2);
@@ -476,7 +491,7 @@ public class GraywaterAdapterTest {
 		assertEquals(15, adapter.getItemCount());
 
 		adapter.remove(3);
-		adapter.add(3, "three");
+		adapter.add(3, "three", false);
 
 		final GraywaterAdapter.BinderResult tumblr = adapter.computeItemAndBinderIndex(1);
 		assertEquals(0, tumblr.itemPosition);
