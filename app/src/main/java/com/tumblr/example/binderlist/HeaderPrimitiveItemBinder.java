@@ -6,6 +6,7 @@ import com.tumblr.example.model.Primitive;
 import com.tumblr.example.viewholder.PrimitiveViewHolder;
 import com.tumblr.graywater.GraywaterAdapter;
 
+import javax.inject.Provider;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,17 +16,19 @@ import java.util.List;
 public class HeaderPrimitiveItemBinder implements
 		GraywaterAdapter.ItemBinder<Primitive.Header, PrimitiveViewHolder,
 				GraywaterAdapter.Binder<Primitive.Header, PrimitiveViewHolder, ? extends PrimitiveViewHolder>> {
-	private final HeaderBinder mHeaderBinder;
+	private final Provider<HeaderBinder> mHeaderBinder;
 
-	public HeaderPrimitiveItemBinder(final HeaderBinder headerBinder) {
+	public HeaderPrimitiveItemBinder(final Provider<HeaderBinder> headerBinder) {
 		mHeaderBinder = headerBinder;
 	}
 
 	@NonNull
 	@Override
-	public List<GraywaterAdapter.Binder<Primitive.Header, PrimitiveViewHolder, ? extends PrimitiveViewHolder>>
+	public List<Provider<
+			? extends GraywaterAdapter.Binder<Primitive.Header, PrimitiveViewHolder, ? extends PrimitiveViewHolder>>>
 	getBinderList(@NonNull final Primitive.Header model, final int position) {
-		return new ArrayList<GraywaterAdapter.Binder<Primitive.Header, PrimitiveViewHolder, ? extends PrimitiveViewHolder>>() {{
+		return new ArrayList<Provider<
+				? extends GraywaterAdapter.Binder<Primitive.Header, PrimitiveViewHolder, ? extends PrimitiveViewHolder>>>() {{
 			add(mHeaderBinder);
 		}};
 	}

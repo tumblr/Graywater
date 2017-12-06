@@ -1,5 +1,6 @@
 package com.tumblr.example;
 
+import android.support.annotation.NonNull;
 import com.tumblr.example.binder.ColorNameToastBinder;
 import com.tumblr.example.binder.HeaderBinder;
 import com.tumblr.example.binder.PaletteColorBinder;
@@ -19,6 +20,8 @@ import com.tumblr.example.viewholdercreator.HeaderViewHolderCreator;
 import com.tumblr.example.viewholdercreator.TextPrimitiveViewHolderCreator;
 import com.tumblr.graywater.GraywaterAdapter;
 
+import javax.inject.Provider;
+
 /**
  * Created by ericleong on 3/13/16.
  */
@@ -34,26 +37,52 @@ public class PrimitiveAdapter extends GraywaterAdapter<
 		register(new ColorPrimitiveViewHolderCreator(), ColorPrimitiveViewHolder.class);
 
 		// A ColorNamePrimitive is composed of a string and a single color
-		final TextPrimitiveBinder<ColorNamePrimitive> colorNameTextBinder = new TextPrimitiveBinder<>();
-		final ColorNameToastBinder colorNameToastBinder = new ColorNameToastBinder();
+		final Provider<TextPrimitiveBinder<ColorNamePrimitive>> colorNameTextBinder = new Provider<TextPrimitiveBinder<ColorNamePrimitive>>() {
+			@Override
+			public TextPrimitiveBinder<ColorNamePrimitive> get() {
+				return new TextPrimitiveBinder<>();
+			}
+		};
+		final Provider<ColorNameToastBinder> colorNameToastBinder = new Provider<ColorNameToastBinder>() {
+			@Override
+			public ColorNameToastBinder get() {
+				return new ColorNameToastBinder();
+			}
+		};
 
 		final ColorNamePrimitiveItemBinder colorNamePrimitiveItemBinder =
 				new ColorNamePrimitiveItemBinder(this, colorNameTextBinder, colorNameToastBinder);
 		register(ColorNamePrimitive.class, colorNamePrimitiveItemBinder, colorNamePrimitiveItemBinder);
 
 		// A header always displays the same text
-		final HeaderBinder headerBinder = new HeaderBinder();
+		final Provider<HeaderBinder> headerBinder = new Provider<HeaderBinder>() {
+			@Override
+			public HeaderBinder get() {
+				return new HeaderBinder();
+			}
+		};
 		register(Primitive.Header.class, new HeaderPrimitiveItemBinder(headerBinder), null);
 
 		// A palette is composed of a string and a variable number of colors
-		final TextPrimitiveBinder<Palette> paletteTextPrimitiveBinder = new TextPrimitiveBinder<>();
-		final PaletteColorBinder paletteColorBinder = new PaletteColorBinder();
+		final Provider<TextPrimitiveBinder<Palette>> paletteTextPrimitiveBinder = new Provider<TextPrimitiveBinder<Palette>>() {
+			@Override
+			public TextPrimitiveBinder<Palette> get() {
+				return new TextPrimitiveBinder<>();
+			}
+		};
+		final Provider<PaletteColorBinder> paletteColorBinder = new Provider<PaletteColorBinder>() {
+			@Override
+			public PaletteColorBinder get() {
+				return new PaletteColorBinder();
+			}
+		};
 
 		final PaletteItemBinder paletteBinderList =
 				new PaletteItemBinder(paletteTextPrimitiveBinder, paletteColorBinder);
 		register(Palette.class, paletteBinderList, paletteBinderList);
 	}
 
+	@NonNull
 	@Override
 	protected Class<? extends Primitive> getModelType(final Primitive model) {
 		return model.getClass();

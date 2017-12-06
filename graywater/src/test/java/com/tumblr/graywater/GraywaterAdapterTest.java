@@ -11,6 +11,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 
+import javax.inject.Provider;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -98,7 +99,8 @@ public class GraywaterAdapterTest {
 
 			@Override
 			public void prepare(@NonNull final String model,
-			                    @NonNull final List<Binder<? super String, RecyclerView.ViewHolder, ? extends RecyclerView.ViewHolder>> binderList,
+			                    final List<Provider<Binder<
+					                    ? super String, RecyclerView.ViewHolder, ? extends RecyclerView.ViewHolder>>> binderList,
 			                    final int binderIndex) {
 
 			}
@@ -106,9 +108,10 @@ public class GraywaterAdapterTest {
 			@Override
 			public void bind(@NonNull final String model,
 			                 @NonNull final TextViewHolder holder,
-			                 @NonNull final List<
-					                 Binder<? super String, RecyclerView.ViewHolder, ? extends RecyclerView.ViewHolder>> binders,
-			                 final int binderIndex, @NonNull final ActionListener<String, RecyclerView.ViewHolder, TextViewHolder> actionListener) {
+			                 @NonNull final List<Provider<Binder<
+					                 ? super String, RecyclerView.ViewHolder, ? extends RecyclerView.ViewHolder>>> binderList,
+			                 final int binderIndex,
+			                 @NonNull final ActionListener<String, RecyclerView.ViewHolder, TextViewHolder> actionListener) {
 				((TextView) holder.itemView).setText(model);
 			}
 
@@ -126,7 +129,8 @@ public class GraywaterAdapterTest {
 
 			@Override
 			public void prepare(@NonNull final Uri model,
-			                    @NonNull final List<Binder<? super Uri, RecyclerView.ViewHolder, ? extends RecyclerView.ViewHolder>> binders,
+			                    final List<Provider<Binder<
+					                    ? super Uri, RecyclerView.ViewHolder, ? extends RecyclerView.ViewHolder>>> binderList,
 			                    final int binderIndex) {
 
 			}
@@ -134,7 +138,8 @@ public class GraywaterAdapterTest {
 			@Override
 			public void bind(@NonNull final Uri model,
 			                 @NonNull final ImageViewHolder holder,
-			                 @NonNull final List<Binder<? super Uri, RecyclerView.ViewHolder, ? extends RecyclerView.ViewHolder>> binders,
+			                 @NonNull final List<Provider<Binder<
+					                 ? super Uri, RecyclerView.ViewHolder, ? extends RecyclerView.ViewHolder>>> binderList,
 			                 final int binderIndex,
 			                 @NonNull final ActionListener<Uri, RecyclerView.ViewHolder, ImageViewHolder> actionListener) {
 				((ImageView) holder.itemView).setImageURI(model); // not a good idea in production ;)
@@ -152,8 +157,18 @@ public class GraywaterAdapterTest {
 			register(new TextViewHolderCreator(), TextViewHolder.class);
 			register(new ImageViewHolderCreator(), ImageViewHolder.class);
 
-			final TextBinder textBinder = new TextBinder();
-			final ImageBinder imageBinder = new ImageBinder();
+			final Provider<TextBinder> textBinder = new Provider<TextBinder>() {
+				@Override
+				public TextBinder get() {
+					return new TextBinder();
+				}
+			};
+			final Provider<ImageBinder> imageBinder = new Provider<ImageBinder>() {
+				@Override
+				public ImageBinder get() {
+					return new ImageBinder();
+				}
+			};
 
 			register(
 					String.class,
@@ -161,10 +176,10 @@ public class GraywaterAdapterTest {
 							TestBinder<String, RecyclerView.ViewHolder, ? extends RecyclerView.ViewHolder>>() {
 						@NonNull
 						@Override
-						public List<TestBinder<String, RecyclerView.ViewHolder, ? extends RecyclerView.ViewHolder>> getBinderList(
-								@NonNull final String model,
-								final int position) {
-							return new ArrayList<TestBinder<String, RecyclerView.ViewHolder, ? extends RecyclerView.ViewHolder>>() {{
+						public List<Provider<? extends TestBinder<String, RecyclerView.ViewHolder, ? extends RecyclerView.ViewHolder>>>
+						getBinderList(@NonNull final String model, final int position) {
+							return new ArrayList<Provider<
+									? extends TestBinder<String, RecyclerView.ViewHolder, ? extends RecyclerView.ViewHolder>>>() {{
 								add(textBinder);
 								add(textBinder);
 							}};
@@ -177,10 +192,10 @@ public class GraywaterAdapterTest {
 							TestBinder<Uri, RecyclerView.ViewHolder, ? extends RecyclerView.ViewHolder>>() {
 						@NonNull
 						@Override
-						public List<TestBinder<Uri, RecyclerView.ViewHolder, ? extends RecyclerView.ViewHolder>> getBinderList(
-								@NonNull final Uri model,
-								final int position) {
-							return new ArrayList<TestBinder<Uri, RecyclerView.ViewHolder, ? extends RecyclerView.ViewHolder>>() {{
+						public List<Provider<? extends TestBinder<Uri, RecyclerView.ViewHolder,
+								? extends RecyclerView.ViewHolder>>> getBinderList(@NonNull final Uri model, final int position) {
+							return new ArrayList<
+									Provider<? extends TestBinder<Uri, RecyclerView.ViewHolder, ? extends RecyclerView.ViewHolder>>>() {{
 								add(imageBinder);
 								add(imageBinder);
 								add(imageBinder);

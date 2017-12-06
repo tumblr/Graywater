@@ -7,6 +7,7 @@ import com.tumblr.example.viewholder.ColorPrimitiveViewHolder;
 import com.tumblr.example.viewholder.PrimitiveViewHolder;
 import com.tumblr.graywater.GraywaterAdapter;
 
+import javax.inject.Provider;
 import java.util.List;
 
 /**
@@ -21,8 +22,8 @@ public class ColorNameToastBinder implements GraywaterAdapter.Binder<ColorNamePr
 
 	@Override
 	public void prepare(@NonNull final ColorNamePrimitive model,
-	                    @NonNull final List<GraywaterAdapter.Binder<
-			                    ? super ColorNamePrimitive, PrimitiveViewHolder, ? extends PrimitiveViewHolder>> binders,
+	                    final List<Provider<GraywaterAdapter.Binder<
+			                    ? super ColorNamePrimitive, PrimitiveViewHolder, ? extends PrimitiveViewHolder>>> binderList,
 	                    final int binderIndex) {
 
 	}
@@ -30,13 +31,13 @@ public class ColorNameToastBinder implements GraywaterAdapter.Binder<ColorNamePr
 	@Override
 	public void bind(@NonNull final ColorNamePrimitive model,
 	                 @NonNull final ColorPrimitiveViewHolder holder,
-	                 @NonNull final List<GraywaterAdapter.Binder<
-			                 ? super ColorNamePrimitive, PrimitiveViewHolder, ? extends PrimitiveViewHolder>> binders,
+	                 @NonNull final List<Provider<GraywaterAdapter.Binder<
+			                 ? super ColorNamePrimitive, PrimitiveViewHolder, ? extends PrimitiveViewHolder>>> binderList,
 	                 final int binderIndex,
 	                 @NonNull final GraywaterAdapter.ActionListener<
 			                 ColorNamePrimitive, PrimitiveViewHolder, ColorPrimitiveViewHolder> actionListener) {
 		holder.getView().setBackgroundColor(holder.getView().getResources().getColor(model.getColor()));
-		holder.getActionListenerDelegate().update(actionListener, model, holder, binders, binderIndex, null);
+		holder.getActionListenerDelegate().update(actionListener, model, holder, binderList, binderIndex, null);
 		holder.getView().setOnClickListener(holder.getActionListenerDelegate());
 	}
 

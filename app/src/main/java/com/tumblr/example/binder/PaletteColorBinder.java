@@ -9,6 +9,7 @@ import com.tumblr.example.viewholder.ColorPrimitiveViewHolder;
 import com.tumblr.example.viewholder.PrimitiveViewHolder;
 import com.tumblr.graywater.GraywaterAdapter;
 
+import javax.inject.Provider;
 import java.util.List;
 
 /**
@@ -23,8 +24,8 @@ public class PaletteColorBinder implements GraywaterAdapter.Binder<Palette,Primi
 
 	@Override
 	public void prepare(@NonNull final Palette model,
-	                    @NonNull final List<GraywaterAdapter.Binder<
-			                    ? super Palette, PrimitiveViewHolder, ? extends PrimitiveViewHolder>> binders,
+	                    final List<Provider<GraywaterAdapter.Binder<
+			                    ? super Palette, PrimitiveViewHolder, ? extends PrimitiveViewHolder>>> binderList,
 	                    final int binderIndex) {
 
 	}
@@ -32,8 +33,8 @@ public class PaletteColorBinder implements GraywaterAdapter.Binder<Palette,Primi
 	@Override
 	public void bind(@NonNull final Palette model,
 	                 @NonNull final ColorPrimitiveViewHolder holder,
-	                 @NonNull final List<GraywaterAdapter.Binder<
-			                 ? super Palette, PrimitiveViewHolder, ? extends PrimitiveViewHolder>> binders,
+	                 @NonNull final List<Provider<GraywaterAdapter.Binder<
+			                 ? super Palette, PrimitiveViewHolder, ? extends PrimitiveViewHolder>>> binderList,
 	                 final int binderIndex,
 	                 @NonNull final GraywaterAdapter.ActionListener<
 			                 Palette, PrimitiveViewHolder, ColorPrimitiveViewHolder> actionListener) {

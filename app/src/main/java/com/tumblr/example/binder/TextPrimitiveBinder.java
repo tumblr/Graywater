@@ -7,6 +7,7 @@ import com.tumblr.example.viewholder.PrimitiveViewHolder;
 import com.tumblr.example.viewholder.TextPrimitiveViewHolder;
 import com.tumblr.graywater.GraywaterAdapter;
 
+import javax.inject.Provider;
 import java.util.List;
 
 /**
@@ -21,8 +22,8 @@ public class TextPrimitiveBinder<T extends Primitive.Text>
 
 	@Override
 	public void prepare(@NonNull final T model,
-	                    @NonNull final List<GraywaterAdapter.Binder<
-			                    ? super T, PrimitiveViewHolder, ? extends PrimitiveViewHolder>> binders,
+	                    final List<Provider<GraywaterAdapter.Binder<
+			                    ? super T, PrimitiveViewHolder, ? extends PrimitiveViewHolder>>> binderList,
 	                    final int binderIndex) {
 
 	}
@@ -30,7 +31,8 @@ public class TextPrimitiveBinder<T extends Primitive.Text>
 	@Override
 	public void bind(@NonNull final T model,
 	                 @NonNull final TextPrimitiveViewHolder holder,
-	                 @NonNull final List<GraywaterAdapter.Binder<? super T, PrimitiveViewHolder, ? extends PrimitiveViewHolder>> binders,
+	                 @NonNull final List<Provider<GraywaterAdapter.Binder<
+			                 ? super T, PrimitiveViewHolder, ? extends PrimitiveViewHolder>>> binderList,
 	                 final int binderIndex,
 	                 @NonNull final GraywaterAdapter.ActionListener<T, PrimitiveViewHolder, TextPrimitiveViewHolder> actionListener) {
 		holder.getTextView().setText(model.getString());

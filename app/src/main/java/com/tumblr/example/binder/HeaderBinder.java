@@ -7,6 +7,7 @@ import com.tumblr.example.viewholder.HeaderViewHolder;
 import com.tumblr.example.viewholder.PrimitiveViewHolder;
 import com.tumblr.graywater.GraywaterAdapter;
 
+import javax.inject.Provider;
 import java.util.List;
 
 /**
@@ -21,8 +22,8 @@ public class HeaderBinder implements GraywaterAdapter.Binder<Primitive.Header,Pr
 
 	@Override
 	public void prepare(@NonNull final Primitive.Header model,
-	                    @NonNull final List<GraywaterAdapter.Binder<
-			                    ? super Primitive.Header, PrimitiveViewHolder, ? extends PrimitiveViewHolder>> binders,
+	                    final List<Provider<GraywaterAdapter.Binder<
+			                    ? super Primitive.Header, PrimitiveViewHolder, ? extends PrimitiveViewHolder>>> binderList,
 	                    final int binderIndex) {
 
 	}
@@ -30,8 +31,8 @@ public class HeaderBinder implements GraywaterAdapter.Binder<Primitive.Header,Pr
 	@Override
 	public void bind(@NonNull final Primitive.Header model,
 	                 @NonNull final HeaderViewHolder holder,
-	                 @NonNull final List<GraywaterAdapter.Binder<
-			                 ? super Primitive.Header, PrimitiveViewHolder, ? extends PrimitiveViewHolder>> binders,
+	                 @NonNull final List<Provider<GraywaterAdapter.Binder<
+			                 ? super Primitive.Header, PrimitiveViewHolder, ? extends PrimitiveViewHolder>>> binderList,
 	                 final int binderIndex,
 	                 @NonNull final GraywaterAdapter.ActionListener<
 			                 Primitive.Header, PrimitiveViewHolder, HeaderViewHolder> actionListener) {

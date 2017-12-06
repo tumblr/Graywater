@@ -9,6 +9,7 @@ import com.tumblr.example.model.Palette;
 import com.tumblr.example.viewholder.PrimitiveViewHolder;
 import com.tumblr.graywater.GraywaterAdapter;
 
+import javax.inject.Provider;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,19 +19,20 @@ import java.util.List;
 public class PaletteItemBinder implements GraywaterAdapter.ItemBinder<Palette, PrimitiveViewHolder,
 		GraywaterAdapter.Binder<Palette, PrimitiveViewHolder, ? extends PrimitiveViewHolder>>,
 		GraywaterAdapter.ActionListener<Palette, PrimitiveViewHolder, PrimitiveViewHolder> {
-	private final TextPrimitiveBinder<Palette> mPaletteTextPrimitiveBinder;
-	private final PaletteColorBinder mPaletteColorBinder;
+	private final Provider<TextPrimitiveBinder<Palette>> mPaletteTextPrimitiveBinder;
+	private final Provider<PaletteColorBinder> mPaletteColorBinder;
 
-	public PaletteItemBinder(final TextPrimitiveBinder<Palette> paletteTextPrimitiveBinder, final PaletteColorBinder paletteColorBinder) {
+	public PaletteItemBinder(final Provider<TextPrimitiveBinder<Palette>> paletteTextPrimitiveBinder,
+	                         final Provider<PaletteColorBinder> paletteColorBinder) {
 		mPaletteTextPrimitiveBinder = paletteTextPrimitiveBinder;
 		mPaletteColorBinder = paletteColorBinder;
 	}
 
 	@NonNull
 	@Override
-	public List<GraywaterAdapter.Binder<Palette, PrimitiveViewHolder, ? extends PrimitiveViewHolder>>
+	public List<Provider<? extends GraywaterAdapter.Binder<Palette, PrimitiveViewHolder, ? extends PrimitiveViewHolder>>>
 	getBinderList(@NonNull final Palette model, final int position) {
-		return new ArrayList<GraywaterAdapter.Binder<Palette, PrimitiveViewHolder, ? extends PrimitiveViewHolder>>() {{
+		return new ArrayList<Provider<? extends GraywaterAdapter.Binder<Palette, PrimitiveViewHolder, ? extends PrimitiveViewHolder>>>() {{
 			add(mPaletteTextPrimitiveBinder);
 
 			for (int color : model.getColors()) {
@@ -43,8 +45,8 @@ public class PaletteItemBinder implements GraywaterAdapter.ItemBinder<Palette, P
 	public void act(@NonNull final Palette model,
 	                @NonNull final PrimitiveViewHolder holder,
 	                @NonNull final View v,
-	                @NonNull final List<GraywaterAdapter.Binder<
-			                ? super Palette, PrimitiveViewHolder, ? extends PrimitiveViewHolder>> binders,
+	                @NonNull final List<Provider<GraywaterAdapter.Binder<
+			                ? super Palette, PrimitiveViewHolder, ? extends PrimitiveViewHolder>>> binderList,
 	                final int binderIndex,
 	                @Nullable final Object obj) {
 
