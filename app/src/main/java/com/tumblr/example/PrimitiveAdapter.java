@@ -22,7 +22,11 @@ import com.tumblr.graywater.GraywaterAdapter;
 /**
  * Created by ericleong on 3/13/16.
  */
-public class PrimitiveAdapter extends GraywaterAdapter<Primitive, PrimitiveViewHolder, Class<? extends Primitive>> {
+public class PrimitiveAdapter extends GraywaterAdapter<
+		Primitive,
+		PrimitiveViewHolder,
+		GraywaterAdapter.Binder<? extends Primitive, PrimitiveViewHolder, ? extends PrimitiveViewHolder>,
+		Class<? extends Primitive>> {
 
 	public PrimitiveAdapter() {
 		register(new TextPrimitiveViewHolderCreator(), TextPrimitiveViewHolder.class);
@@ -33,9 +37,9 @@ public class PrimitiveAdapter extends GraywaterAdapter<Primitive, PrimitiveViewH
 		final TextPrimitiveBinder<ColorNamePrimitive> colorNameTextBinder = new TextPrimitiveBinder<>();
 		final ColorNameToastBinder colorNameToastBinder = new ColorNameToastBinder();
 
-		final ColorNamePrimitiveItemBinder colorNamePrimitiveBinderList =
+		final ColorNamePrimitiveItemBinder colorNamePrimitiveItemBinder =
 				new ColorNamePrimitiveItemBinder(this, colorNameTextBinder, colorNameToastBinder);
-		register(ColorNamePrimitive.class, colorNamePrimitiveBinderList, colorNamePrimitiveBinderList);
+		register(ColorNamePrimitive.class, colorNamePrimitiveItemBinder, colorNamePrimitiveItemBinder);
 
 		// A header always displays the same text
 		final HeaderBinder headerBinder = new HeaderBinder();

@@ -1,29 +1,28 @@
 package com.tumblr.example.binder;
 
 import android.support.annotation.NonNull;
-import android.util.Log;
-import android.view.ViewGroup;
-import com.tumblr.graywater.GraywaterAdapter;
 import com.tumblr.example.R;
 import com.tumblr.example.model.Primitive;
 import com.tumblr.example.viewholder.HeaderViewHolder;
+import com.tumblr.example.viewholder.PrimitiveViewHolder;
+import com.tumblr.graywater.GraywaterAdapter;
 
 import java.util.List;
 
 /**
  * Created by ericleong on 3/13/16.
  */
-public class HeaderBinder implements GraywaterAdapter.Binder<Primitive.Header, HeaderViewHolder> {
+public class HeaderBinder implements GraywaterAdapter.Binder<Primitive.Header,PrimitiveViewHolder,HeaderViewHolder> {
 
-	@NonNull
 	@Override
-	public Class<HeaderViewHolder> getViewHolderType() {
-		return HeaderViewHolder.class;
+	public int getViewType(final Primitive.Header model) {
+		return R.layout.item_header;
 	}
 
 	@Override
 	public void prepare(@NonNull final Primitive.Header model,
-	                    final List<GraywaterAdapter.Binder<? super Primitive.Header, ? extends HeaderViewHolder>> binders,
+	                    @NonNull final List<GraywaterAdapter.Binder<
+			                    ? super Primitive.Header, PrimitiveViewHolder, ? extends PrimitiveViewHolder>> binders,
 	                    final int binderIndex) {
 
 	}
@@ -31,9 +30,11 @@ public class HeaderBinder implements GraywaterAdapter.Binder<Primitive.Header, H
 	@Override
 	public void bind(@NonNull final Primitive.Header model,
 	                 @NonNull final HeaderViewHolder holder,
-	                 @NonNull final List<GraywaterAdapter.Binder<? super Primitive.Header, ? extends HeaderViewHolder>> binders,
+	                 @NonNull final List<GraywaterAdapter.Binder<
+			                 ? super Primitive.Header, PrimitiveViewHolder, ? extends PrimitiveViewHolder>> binders,
 	                 final int binderIndex,
-	                 @NonNull final GraywaterAdapter.ActionListener<Primitive.Header, HeaderViewHolder> actionListener) {
+	                 @NonNull final GraywaterAdapter.ActionListener<
+			                 Primitive.Header, PrimitiveViewHolder, HeaderViewHolder> actionListener) {
 
 	}
 

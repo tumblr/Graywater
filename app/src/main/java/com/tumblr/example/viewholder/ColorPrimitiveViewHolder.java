@@ -10,7 +10,7 @@ import com.tumblr.graywater.GraywaterAdapter;
  */
 public class ColorPrimitiveViewHolder extends PrimitiveViewHolder {
 
-	private GraywaterAdapter.ActionListenerDelegate<ColorNamePrimitive, ColorPrimitiveViewHolder>
+	private GraywaterAdapter.ActionListenerDelegate<ColorNamePrimitive, PrimitiveViewHolder, ColorPrimitiveViewHolder>
 			mActionListenerDelegate = new GraywaterAdapter.ActionListenerDelegate<>();
 
 	private final View view;
@@ -24,7 +24,8 @@ public class ColorPrimitiveViewHolder extends PrimitiveViewHolder {
 		return view;
 	}
 
-	public GraywaterAdapter.ActionListenerDelegate<ColorNamePrimitive, ColorPrimitiveViewHolder> getActionListenerDelegate() {
+	public GraywaterAdapter.ActionListenerDelegate<ColorNamePrimitive, PrimitiveViewHolder, ColorPrimitiveViewHolder>
+	getActionListenerDelegate() {
 		return mActionListenerDelegate;
 	}
 }
