@@ -34,7 +34,6 @@ import java.util.Set;
  * 		the binder type.
  * @param <MT>
  * 		the type of the model type ({@code Class<T>} for example)
- * @see <a href="https://github.tumblr.net/TumblrMobile/android2/blob/master/graywater/README.md">README</a>
  */
 public abstract class GraywaterAdapter<
 		T,
@@ -310,7 +309,7 @@ public abstract class GraywaterAdapter<
 	                       final List<Provider<Binder<? super T, VH, ? extends VH>>> binderList,
 	                       final int binderIndex) {
 		if (!mViewHolderPreparedCache.contains(viewHolderPosition)) {
-			binder.prepare(model, (List) binderList, binderIndex);
+			binder.prepare(model, binderList, binderIndex);
 			mViewHolderPreparedCache.add(viewHolderPosition);
 		}
 	}
@@ -702,7 +701,7 @@ public abstract class GraywaterAdapter<
 		 * 		the action listener to use
 		 */
 		void bind(@NonNull U model, @NonNull W holder, @NonNull List<Provider<Binder<? super U, V, ? extends V>>> binderList,
-		          int binderIndex, @NonNull ActionListener<U, V, W> actionListener);
+		          int binderIndex, @Nullable ActionListener<U, V, W> actionListener);
 
 		/**
 		 * Called when {@link android.support.v7.widget.RecyclerView.Adapter#onViewRecycled(RecyclerView.ViewHolder)}

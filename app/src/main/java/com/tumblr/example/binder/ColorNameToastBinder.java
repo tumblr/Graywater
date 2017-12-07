@@ -1,19 +1,26 @@
 package com.tumblr.example.binder;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import com.tumblr.example.R;
 import com.tumblr.example.model.ColorNamePrimitive;
 import com.tumblr.example.viewholder.ColorPrimitiveViewHolder;
 import com.tumblr.example.viewholder.PrimitiveViewHolder;
 import com.tumblr.graywater.GraywaterAdapter;
 
+import javax.inject.Inject;
 import javax.inject.Provider;
 import java.util.List;
 
 /**
  * Created by ericleong on 3/24/16.
  */
-public class ColorNameToastBinder implements GraywaterAdapter.Binder<ColorNamePrimitive,PrimitiveViewHolder,ColorPrimitiveViewHolder> {
+public class ColorNameToastBinder implements GraywaterAdapter.Binder<ColorNamePrimitive, PrimitiveViewHolder, ColorPrimitiveViewHolder> {
+
+	@Inject
+	public ColorNameToastBinder() {
+
+	}
 
 	@Override
 	public int getViewType(final ColorNamePrimitive model) {
@@ -34,7 +41,7 @@ public class ColorNameToastBinder implements GraywaterAdapter.Binder<ColorNamePr
 	                 @NonNull final List<Provider<GraywaterAdapter.Binder<
 			                 ? super ColorNamePrimitive, PrimitiveViewHolder, ? extends PrimitiveViewHolder>>> binderList,
 	                 final int binderIndex,
-	                 @NonNull final GraywaterAdapter.ActionListener<
+	                 @Nullable final GraywaterAdapter.ActionListener<
 			                 ColorNamePrimitive, PrimitiveViewHolder, ColorPrimitiveViewHolder> actionListener) {
 		holder.getView().setBackgroundColor(holder.getView().getResources().getColor(model.getColor()));
 		holder.getActionListenerDelegate().update(actionListener, model, holder, binderList, binderIndex, null);

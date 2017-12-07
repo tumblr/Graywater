@@ -2,6 +2,7 @@ package com.tumblr.graywater;
 
 import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
@@ -111,7 +112,7 @@ public class GraywaterAdapterTest {
 			                 @NonNull final List<Provider<Binder<
 					                 ? super String, RecyclerView.ViewHolder, ? extends RecyclerView.ViewHolder>>> binderList,
 			                 final int binderIndex,
-			                 @NonNull final ActionListener<String, RecyclerView.ViewHolder, TextViewHolder> actionListener) {
+			                 @Nullable final ActionListener<String, RecyclerView.ViewHolder, TextViewHolder> actionListener) {
 				((TextView) holder.itemView).setText(model);
 			}
 
@@ -141,7 +142,7 @@ public class GraywaterAdapterTest {
 			                 @NonNull final List<Provider<Binder<
 					                 ? super Uri, RecyclerView.ViewHolder, ? extends RecyclerView.ViewHolder>>> binderList,
 			                 final int binderIndex,
-			                 @NonNull final ActionListener<Uri, RecyclerView.ViewHolder, ImageViewHolder> actionListener) {
+			                 @Nullable final ActionListener<Uri, RecyclerView.ViewHolder, ImageViewHolder> actionListener) {
 				((ImageView) holder.itemView).setImageURI(model); // not a good idea in production ;)
 			}
 

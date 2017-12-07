@@ -1,19 +1,26 @@
 package com.tumblr.example.binder;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import com.tumblr.example.R;
 import com.tumblr.example.model.Primitive;
 import com.tumblr.example.viewholder.HeaderViewHolder;
 import com.tumblr.example.viewholder.PrimitiveViewHolder;
 import com.tumblr.graywater.GraywaterAdapter;
 
+import javax.inject.Inject;
 import javax.inject.Provider;
 import java.util.List;
 
 /**
  * Created by ericleong on 3/13/16.
  */
-public class HeaderBinder implements GraywaterAdapter.Binder<Primitive.Header,PrimitiveViewHolder,HeaderViewHolder> {
+public class HeaderBinder implements GraywaterAdapter.Binder<Primitive.Header, PrimitiveViewHolder, HeaderViewHolder> {
+
+	@Inject
+	public HeaderBinder() {
+
+	}
 
 	@Override
 	public int getViewType(final Primitive.Header model) {
@@ -34,7 +41,7 @@ public class HeaderBinder implements GraywaterAdapter.Binder<Primitive.Header,Pr
 	                 @NonNull final List<Provider<GraywaterAdapter.Binder<
 			                 ? super Primitive.Header, PrimitiveViewHolder, ? extends PrimitiveViewHolder>>> binderList,
 	                 final int binderIndex,
-	                 @NonNull final GraywaterAdapter.ActionListener<
+	                 @Nullable final GraywaterAdapter.ActionListener<
 			                 Primitive.Header, PrimitiveViewHolder, HeaderViewHolder> actionListener) {
 
 	}

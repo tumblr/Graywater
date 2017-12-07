@@ -7,10 +7,12 @@ import android.widget.Toast;
 import com.tumblr.example.PrimitiveAdapter;
 import com.tumblr.example.binder.ColorNameToastBinder;
 import com.tumblr.example.binder.TextPrimitiveBinder;
+import com.tumblr.example.dagger.PerActivity;
 import com.tumblr.example.model.ColorNamePrimitive;
 import com.tumblr.example.viewholder.PrimitiveViewHolder;
 import com.tumblr.graywater.GraywaterAdapter;
 
+import javax.inject.Inject;
 import javax.inject.Provider;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +20,7 @@ import java.util.List;
 /**
  * Created by ericleong on 3/28/16.
  */
+@PerActivity
 public class ColorNamePrimitiveItemBinder
 		implements GraywaterAdapter.ItemBinder<ColorNamePrimitive, PrimitiveViewHolder,
 		GraywaterAdapter.Binder<ColorNamePrimitive, PrimitiveViewHolder, ? extends PrimitiveViewHolder>>,
@@ -26,9 +29,10 @@ public class ColorNamePrimitiveItemBinder
 	private final Provider<TextPrimitiveBinder<ColorNamePrimitive>> mColorNameTextBinder;
 	private final Provider<ColorNameToastBinder> mColorNameToastBinder;
 
-	private final PrimitiveAdapter mAdapter;
+	private final Provider<PrimitiveAdapter> mAdapter;
 
-	public ColorNamePrimitiveItemBinder(final PrimitiveAdapter adapter,
+	@Inject
+	public ColorNamePrimitiveItemBinder(final Provider<PrimitiveAdapter> adapter,
 	                                    final Provider<TextPrimitiveBinder<ColorNamePrimitive>> colorNameTextBinder,
 	                                    final Provider<ColorNameToastBinder> colorNameToastBinder) {
 		mColorNameTextBinder = colorNameTextBinder;
@@ -57,7 +61,9 @@ public class ColorNamePrimitiveItemBinder
 	                @Nullable final Object obj) {
 		Toast.makeText(v.getContext(), model.getString(), Toast.LENGTH_SHORT).show();
 
-		mAdapter.add(mAdapter.getItemPosition(holder.getAdapterPosition()) + 1,
+		final PrimitiveAdapter adapter = mAdapter.get();
+
+		adapter.add(adapter.getItemPosition(holder.getAdapterPosition()) + 1,
 				new ColorNamePrimitive(model.getColor(), model.getString() + "+"), true);
 	}
 }

@@ -1,15 +1,20 @@
 package com.tumblr.example;
 
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import com.tumblr.example.model.ColorNamePrimitive;
 import com.tumblr.example.model.Palette;
 import com.tumblr.example.model.Primitive;
+import dagger.android.support.DaggerAppCompatActivity;
 
-public class MainActivity extends AppCompatActivity {
+import javax.inject.Inject;
+
+public class MainActivity extends DaggerAppCompatActivity {
+
+	@Inject
+	PrimitiveAdapter mPrimitiveAdapter;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -22,60 +27,58 @@ public class MainActivity extends AppCompatActivity {
 			recyclerView.setLayoutManager(new LinearLayoutManager(this));
 			recyclerView.setItemAnimator(new DefaultItemAnimator());
 
-			final PrimitiveAdapter adapter = new PrimitiveAdapter();
-
 			// A header has nothing special
-			adapter.add(new Primitive.Header());
+			mPrimitiveAdapter.add(new Primitive.Header());
 
 			// Reds
-			adapter.add(new ColorNamePrimitive(R.color.red_base_variant_0, "dark red"));
-			adapter.add(new ColorNamePrimitive(R.color.red_base_variant_1, "red"));
-			adapter.add(new ColorNamePrimitive(R.color.red_base_variant_2, "bright red"));
-			adapter.add(new ColorNamePrimitive(R.color.red_base_variant_3, "shy red"));
-			adapter.add(new ColorNamePrimitive(R.color.red_base_variant_4, "embarrassed red"));
-			adapter.add(new Palette("Red Palette", R.color.red_base_variant_0, R.color.red_base_variant_2, R.color.red_base_variant_4));
+			mPrimitiveAdapter.add(new ColorNamePrimitive(R.color.red_base_variant_0, "dark red"));
+			mPrimitiveAdapter.add(new ColorNamePrimitive(R.color.red_base_variant_1, "red"));
+			mPrimitiveAdapter.add(new ColorNamePrimitive(R.color.red_base_variant_2, "bright red"));
+			mPrimitiveAdapter.add(new ColorNamePrimitive(R.color.red_base_variant_3, "shy red"));
+			mPrimitiveAdapter.add(new ColorNamePrimitive(R.color.red_base_variant_4, "embarrassed red"));
+			mPrimitiveAdapter.add(new Palette("Red Palette", R.color.red_base_variant_0, R.color.red_base_variant_2, R.color.red_base_variant_4));
 
-			adapter.add(new ColorNamePrimitive(R.color.yellow_base_variant_0, "dark yellow"));
-			adapter.add(new ColorNamePrimitive(R.color.yellow_base_variant_1, "yellow"));
-			adapter.add(new ColorNamePrimitive(R.color.yellow_base_variant_2, "bright yellow"));
-			adapter.add(new ColorNamePrimitive(R.color.yellow_base_variant_3, "shy yellow"));
-			adapter.add(new ColorNamePrimitive(R.color.yellow_base_variant_4, "embarrassed yellow"));
-			adapter.add(new Palette("Yellow Palette",
+			mPrimitiveAdapter.add(new ColorNamePrimitive(R.color.yellow_base_variant_0, "dark yellow"));
+			mPrimitiveAdapter.add(new ColorNamePrimitive(R.color.yellow_base_variant_1, "yellow"));
+			mPrimitiveAdapter.add(new ColorNamePrimitive(R.color.yellow_base_variant_2, "bright yellow"));
+			mPrimitiveAdapter.add(new ColorNamePrimitive(R.color.yellow_base_variant_3, "shy yellow"));
+			mPrimitiveAdapter.add(new ColorNamePrimitive(R.color.yellow_base_variant_4, "embarrassed yellow"));
+			mPrimitiveAdapter.add(new Palette("Yellow Palette",
 					R.color.yellow_base_variant_0, R.color.yellow_base_variant_2, R.color.yellow_base_variant_4));
 
-			adapter.add(new ColorNamePrimitive(R.color.green_base_variant_0, "dark green"));
-			adapter.add(new ColorNamePrimitive(R.color.green_base_variant_1, "green"));
-			adapter.add(new ColorNamePrimitive(R.color.green_base_variant_2, "bright green"));
-			adapter.add(new ColorNamePrimitive(R.color.green_base_variant_3, "shy green"));
-			adapter.add(new ColorNamePrimitive(R.color.green_base_variant_4, "embarrassed green"));
-			adapter.add(new Palette("Green Palette",
+			mPrimitiveAdapter.add(new ColorNamePrimitive(R.color.green_base_variant_0, "dark green"));
+			mPrimitiveAdapter.add(new ColorNamePrimitive(R.color.green_base_variant_1, "green"));
+			mPrimitiveAdapter.add(new ColorNamePrimitive(R.color.green_base_variant_2, "bright green"));
+			mPrimitiveAdapter.add(new ColorNamePrimitive(R.color.green_base_variant_3, "shy green"));
+			mPrimitiveAdapter.add(new ColorNamePrimitive(R.color.green_base_variant_4, "embarrassed green"));
+			mPrimitiveAdapter.add(new Palette("Green Palette",
 							R.color.green_base_variant_0, R.color.green_base_variant_2, R.color.green_base_variant_4));
 
-			adapter.add(new ColorNamePrimitive(R.color.blue_base_variant_0, "dark blue"));
-			adapter.add(new ColorNamePrimitive(R.color.blue_base_variant_1, "blue"));
-			adapter.add(new ColorNamePrimitive(R.color.blue_base_variant_2, "bright blue"));
-			adapter.add(new ColorNamePrimitive(R.color.blue_base_variant_3, "shy blue"));
-			adapter.add(new ColorNamePrimitive(R.color.blue_base_variant_4, "embarrassed blue"));
-			adapter.add(new Palette("Blue Palette",
+			mPrimitiveAdapter.add(new ColorNamePrimitive(R.color.blue_base_variant_0, "dark blue"));
+			mPrimitiveAdapter.add(new ColorNamePrimitive(R.color.blue_base_variant_1, "blue"));
+			mPrimitiveAdapter.add(new ColorNamePrimitive(R.color.blue_base_variant_2, "bright blue"));
+			mPrimitiveAdapter.add(new ColorNamePrimitive(R.color.blue_base_variant_3, "shy blue"));
+			mPrimitiveAdapter.add(new ColorNamePrimitive(R.color.blue_base_variant_4, "embarrassed blue"));
+			mPrimitiveAdapter.add(new Palette("Blue Palette",
 							R.color.blue_base_variant_0, R.color.blue_base_variant_2, R.color.blue_base_variant_4));
 
-			adapter.add(new ColorNamePrimitive(R.color.purple_base_variant_0, "dark purple"));
-			adapter.add(new ColorNamePrimitive(R.color.purple_base_variant_1, "purple"));
-			adapter.add(new ColorNamePrimitive(R.color.purple_base_variant_2, "bright purple"));
-			adapter.add(new ColorNamePrimitive(R.color.purple_base_variant_3, "shy purple"));
-			adapter.add(new ColorNamePrimitive(R.color.purple_base_variant_4, "embarrassed purple"));
-			adapter.add(new Palette("Purple Palette",
+			mPrimitiveAdapter.add(new ColorNamePrimitive(R.color.purple_base_variant_0, "dark purple"));
+			mPrimitiveAdapter.add(new ColorNamePrimitive(R.color.purple_base_variant_1, "purple"));
+			mPrimitiveAdapter.add(new ColorNamePrimitive(R.color.purple_base_variant_2, "bright purple"));
+			mPrimitiveAdapter.add(new ColorNamePrimitive(R.color.purple_base_variant_3, "shy purple"));
+			mPrimitiveAdapter.add(new ColorNamePrimitive(R.color.purple_base_variant_4, "embarrassed purple"));
+			mPrimitiveAdapter.add(new Palette("Purple Palette",
 							R.color.purple_base_variant_0, R.color.purple_base_variant_2, R.color.purple_base_variant_4));
 
-			adapter.add(new Palette("Rainbow",
+			mPrimitiveAdapter.add(new Palette("Rainbow",
 							R.color.red_base_variant_0, R.color.yellow_base_variant_0, R.color.green_base_variant_0,
 							R.color.blue_base_variant_0, R.color.purple_base_variant_0));
 
-			adapter.add(new Palette("Strange Rainbow",
+			mPrimitiveAdapter.add(new Palette("Strange Rainbow",
 					R.color.red_base_variant_0, R.color.yellow_base_variant_1, R.color.green_base_variant_2,
 					R.color.blue_base_variant_3, R.color.purple_base_variant_4));
 
-			recyclerView.setAdapter(adapter);
+			recyclerView.setAdapter(mPrimitiveAdapter);
 		}
 	}
 }

@@ -1,12 +1,14 @@
 package com.tumblr.example.binder;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import com.tumblr.example.R;
 import com.tumblr.example.model.Primitive;
 import com.tumblr.example.viewholder.PrimitiveViewHolder;
 import com.tumblr.example.viewholder.TextPrimitiveViewHolder;
 import com.tumblr.graywater.GraywaterAdapter;
 
+import javax.inject.Inject;
 import javax.inject.Provider;
 import java.util.List;
 
@@ -15,6 +17,12 @@ import java.util.List;
  */
 public class TextPrimitiveBinder<T extends Primitive.Text>
 		implements GraywaterAdapter.Binder<T,PrimitiveViewHolder,TextPrimitiveViewHolder> {
+
+	@Inject
+	public TextPrimitiveBinder() {
+
+	}
+
 	@Override
 	public int getViewType(final T model) {
 		return R.layout.item_text;
@@ -34,7 +42,7 @@ public class TextPrimitiveBinder<T extends Primitive.Text>
 	                 @NonNull final List<Provider<GraywaterAdapter.Binder<
 			                 ? super T, PrimitiveViewHolder, ? extends PrimitiveViewHolder>>> binderList,
 	                 final int binderIndex,
-	                 @NonNull final GraywaterAdapter.ActionListener<T, PrimitiveViewHolder, TextPrimitiveViewHolder> actionListener) {
+	                 @Nullable final GraywaterAdapter.ActionListener<T, PrimitiveViewHolder, TextPrimitiveViewHolder> actionListener) {
 		holder.getTextView().setText(model.getString());
 	}
 
