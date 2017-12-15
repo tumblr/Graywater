@@ -23,7 +23,7 @@ One naive solution is to map models directly to viewholders. For example, a list
 So to improve performance, the parts of a post that are offscreen can be recycled.
 
 ```
-   model      views
+   model       views
 +---------+   +------+ 
 |         |   | head | <------- does not exist
 |         |   +------+ <------------+
@@ -105,7 +105,7 @@ A minor design point is that `RecyclerView.Adapter#onCreate()` creates the viewh
 
 ### Dependency Injection with Dagger 2 Map Multibindings
 
-For Graywater to know about the ItemBinders and ViewHolderCreators, each of them need to be registered when the adapter is created. When there are a substantial number of both, there can be a significant impact on the time it takes to initialize the adapter.
+For Graywater to know about the ItemBinders and ViewHolderCreators, each of them needs to be registered when the adapter is created. When there are a substantial number of both, there can be a significant impact on the time it takes to initialize the adapter.
 
 One solution is to use [Dagger 2 map multibindings](https://google.github.io/dagger/multibindings#map-multibindings). This allows you to use the full power of dependency injection to control which binders a given screen will support, as well as the ability to inject different versions of the same binder on different screens to facilitate screen-dependent behavior.
 
@@ -129,7 +129,7 @@ _Note that Graywater does not have built-in support for Dagger 2._
 
 ### Lazy Loading Binders
 
-Normally, when an item is added to the adapter, the corresponding an `ItemBinder` is loaded as well as all the necessary `Binder` classes.
+Normally, when an item is added to the adapter, the corresponding `ItemBinder` is loaded as well as all the necessary `Binder` classes.
 
 ```
  Binders             ItemBinders                Items             Screen  
