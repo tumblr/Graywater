@@ -23,7 +23,7 @@ One naive solution is to map models directly to viewholders. For example, a list
 So to improve performance, the parts of a post that are offscreen can be recycled.
 
 ```
-   model      views
+   model       views
 +---------+   +------+ 
 |         |   | head | <------- does not exist
 |         |   +------+ <------------+
@@ -103,12 +103,15 @@ A minor design point is that `RecyclerView.Adapter#onCreate()` creates the viewh
                    +--------+     +------------+     +-------------------+
 ```
 
+### Dependency Injection with Dagger 2 Map Multibindings
 
-Because binders should not contain per-item state, it is better to use dependency injection to inject the binders into the list of binders. To facilitate this, a **BinderProvider** is used to provide binders to item binders. It is also used to provide the `ViewHolderCreator` instances (although this is just for convenience). By doing this, related `Binder`, `ItemBinder` and `ViewHolderCreator` classes can be grouped together.
+For Graywater to know about the ItemBinders and ViewHolderCreators, each of them needs to be registered when the adapter is created. When there are a substantial number of both, there can be a significant impact on the time it takes to initialize the adapter.
+
+One solution is to use [Dagger 2 map multibindings](https://google.github.io/dagger/multibindings#map-multibindings). This allows you to use the full power of dependency injection to control which binders a given screen will support, as well as the ability to inject different versions of the same binder on different screens to facilitate screen-dependent behavior.
 
 ```
                  +------------+                       +----------------+
-         /-----> | ItemBinder | <-------------------- | BinderProvider |
+         /-----> | ItemBinder | <-------------------- | Dagger 2 Maps  |
         /        +------------+                       +----------------+
        /               v                                       v
       /            +--------+     +------------+     +-------------------+
@@ -119,6 +122,44 @@ Because binders should not contain per-item state, it is better to use dependenc
             \----> | Binder | --> | ViewHolder | <-- | ViewHolderCreator |
                    +--------+     +------------+     +-------------------+
 ```
+
+But using Dagger 2 by itself does not improve startup time, because the maps are created at injection time, which requires all the binders to also be created. This can be somewhat alleviated with `Lazy<Map>`, but another benefit of Dagger 2 is the automatic support for `Map<K, Provider<V>>`. When applied to `ItemBinders`, this allows each `ItemBinder` to be constructed on demand.
+
+_Note that Graywater does not have built-in support for Dagger 2._
+
+### Lazy Loading Binders
+
+Normally, when an item is added to the adapter, the corresponding `ItemBinder` is loaded as well as all the necessary `Binder` classes.
+
+```
+ Binders             ItemBinders                Items             Screen  
++--------+          +------------+          +-----------+       +--------+
+| Photo  | -------- |            |       /- | TextPost  |       | Header |
++--------+    /---- | Photo Post | -\   /   +-----------+       +--------+
+| Footer | --x /--- |            |   \----- | PhotoPost |       |        |
++--------+    x     +------------+    /     +-----------+       |        |
+| Header | --x \--- |            | --/   /- | TextPost  |       | Text   |
++--------+    \---- | Text Post  |      /   +-----------+       |        |
+| Text   | -------- |            | ----/                        |        |
++--------+          +------------+                              +--------+
+```
+
+But on-screen, only the first item is visible, and out of the first item, only two components are visible. So in the above example, there is no need to load the "Footer" binder. This is what `List<Provider<Binder>>` facilitates.
+
+```
+ Binders             ItemBinders                Items             Screen  
++--------+          +------------+          +-----------+       +--------+
+| Photo  |          |            |      /-- | TextPost  | -x--- | Header |
++--------+          | Photo Post |     /    +-----------+   \   +--------+
+| Footer |          |            |    /     | PhotoPost |    \- |        |
++--------+          +------------+   /      +-----------+       |        |
+| Header | ---\     |            | -/       | TextPost  |       | Text   |
++--------+     \--- | Text Post  |          +-----------+       |        |
+| Text   | -------- |            |                              |        |
++--------+          +------------+                              +--------+
+```
+
+This is very useful for improving initialization performance when loading long cached lists by deferring binder creation until the binder is nearly on screen.
 
 ## How do you use it?
 

@@ -24,6 +24,7 @@ dependencies {
     testImplementation'junit:junit:4.12'
     testImplementation "org.robolectric:robolectric:3.5"
     api 'com.android.support:recyclerview-v7:26.1.0'
+    api 'javax.inject:javax.inject:1'
 }
 
 checkstyle {

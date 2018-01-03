@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import javax.inject.Provider;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -30,7 +31,7 @@ import java.util.Set;
  * @param <VH>
  * 		the viewholder type.
  * @param <B>
- *      the binder type.
+ * 		the binder type.
  * @param <MT>
  * 		the type of the model type ({@code Class<T>} for example)
  */
@@ -77,20 +78,19 @@ public abstract class GraywaterAdapter<
 	 * Map from model to an action listener. A model may have multiple action listeners if there are multiple events.
 	 */
 	@NonNull
-	private final Map<MT, ActionListener<? extends T, VH, ? extends VH>> mActionListenerMap
-			= new ArrayMap<>();
+	private final Map<MT, ActionListener<? extends T, VH, ? extends VH>> mActionListenerMap = new ArrayMap<>();
 
 	/**
 	 * Index of the last model that was bound.
 	 */
 	private int mPreviousBoundViewHolderPosition = NO_PREVIOUS_BOUND_VIEWHOLDER;
 
-	private final List<List<Binder<? super T, VH, ? extends VH>>> mBinderListCache = new ArrayList<>();
+	private final List<List<Provider<Binder<? super T, VH, ? extends VH>>>> mBinderListCache = new ArrayList<>();
 	private final List<Integer> mViewHolderToItemPositionCache = new ArrayList<>();
 	private final List<Integer> mItemPositionToFirstViewHolderPositionCache = new ArrayList<>();
 	/**
 	 * The viewholders that have had {@link #prepare(int, Binder, Object, List, int)} called on them.
-	 *
+	 * <p>
 	 * {@link #add(Object)}, {@link #remove(int)}, {@link #onViewRecycled(RecyclerView.ViewHolder)}
 	 * will all cause this to be cleared.
 	 */
@@ -118,7 +118,7 @@ public abstract class GraywaterAdapter<
 	 * 		the listener to associate with the model.
 	 */
 	protected void register(@NonNull final MT modelType,
-	                        @NonNull final ItemBinder<? extends T, VH, ? extends B> parts,
+	                        @NonNull final ItemBinder<? extends T, ? extends VH, ? extends B> parts,
 	                        @Nullable final ActionListener<? extends T, VH, ? extends VH> listener) {
 		mItemBinderMap.put(modelType, parts);
 		mActionListenerMap.put(modelType, listener);
@@ -129,7 +129,28 @@ public abstract class GraywaterAdapter<
 	 * 		the model to get the type of.
 	 * @return the appropriate type (for example, {@link Class<T>}).
 	 */
+	@NonNull
 	protected abstract MT getModelType(T model);
+
+	/**
+	 * @param model
+	 * 		the model to get the {@link ItemBinder} for.
+	 * @return the {@link ItemBinder} for the given model.
+	 */
+	@Nullable
+	protected ItemBinder<? extends T, ? extends VH, ? extends B> getItemBinder(final T model) {
+		return mItemBinderMap.get(getModelType(model));
+	}
+
+	/**
+	 * @param model
+	 * 		the model to get the {@link ItemBinder} for.
+	 * @return the {@link ActionListener} for the given model.
+	 */
+	@Nullable
+	protected ActionListener<? extends T, VH, ? extends VH> getActionListener(final T model) {
+		return mActionListenerMap.get(getModelType(model));
+	}
 
 	/**
 	 * @param model
@@ -139,21 +160,13 @@ public abstract class GraywaterAdapter<
 	 * @return the list of binders to use.
 	 */
 	@Nullable
-	protected List<Binder<? super T, VH, ? extends VH>> getParts(final T model, final int position) {
-		final List<Binder<? super T, VH, ? extends VH>> list;
+	protected List<Provider<Binder<? super T, VH, ? extends VH>>> getParts(final T model, final int position) {
+		final List<Provider<Binder<? super T, VH, ? extends VH>>> list;
 
-		final ItemBinder itemBinder = mItemBinderMap.get(getModelType(model));
+		final ItemBinder itemBinder = getItemBinder(model);
 
 		if (itemBinder != null) {
 			list = itemBinder.getBinderList(model, position);
-
-			for (final Binder<? super T, VH, ? extends VH> binder : list) {
-				if (!mViewHolderCreatorMap.containsKey(binder.getViewType(model))) {
-					throw new IllegalArgumentException("Need to register "
-							+ binder.getViewType(model)
-							+ " before adding a ItemBinder that uses it.");
-				}
-			}
 		} else {
 			list = null;
 		}
@@ -175,7 +188,7 @@ public abstract class GraywaterAdapter<
 
 		final int itemIndex = mViewHolderToItemPositionCache.get(viewHolderPosition);
 		final T item = mItems.get(itemIndex);
-		final List<Binder<? super T, VH, ? extends VH>> binders = mBinderListCache.get(itemIndex);
+		final List<Provider<Binder<? super T, VH, ? extends VH>>> binders = mBinderListCache.get(itemIndex);
 		// index of the first item in the set of viewholders for the current item.
 		final int firstVHPosForItem = mItemPositionToFirstViewHolderPositionCache.get(itemIndex);
 
@@ -194,16 +207,16 @@ public abstract class GraywaterAdapter<
 	 * @param viewHolderPosition
 	 * 		position to query
 	 * @return integer value identifying the type of the view needed to represent the item at
-	 *                 <code>position</code>. Type codes need not be contiguous.
+	 * <code>position</code>. Type codes need not be contiguous.
 	 */
 	protected int internalGetItemViewType(final int viewHolderPosition) {
 		final BinderResult result = computeItemAndBinderIndex(viewHolderPosition);
 
-		final Binder<? super T, VH, ? extends VH> binder = result.getBinder();
+		final Provider<Binder<? super T, VH, ? extends VH>> binder = result.getBinder();
 		final int viewType;
 
 		if (binder != null) {
-			viewType = mViewHolderCreatorMap.get(binder.getViewType(result.item)).getViewType();
+			viewType = getViewHolderCreatorMap().get(binder.get().getViewType(result.item)).getViewType();
 		} else {
 			viewType = -1;
 		}
@@ -220,9 +233,14 @@ public abstract class GraywaterAdapter<
 		return mViewTypeToViewHolderClassMap.get(viewType);
 	}
 
+	@NonNull
+	protected Map<Integer, ViewHolderCreator> getViewHolderCreatorMap() {
+		return mViewHolderCreatorMap;
+	}
+
 	@Override
 	public VH onCreateViewHolder(final ViewGroup parent, final int viewType) {
-		return (VH) mViewHolderCreatorMap.get(viewType).create(parent);
+		return (VH) getViewHolderCreatorMap().get(viewType).create(parent);
 	}
 
 	@Override
@@ -230,7 +248,7 @@ public abstract class GraywaterAdapter<
 	public void onBindViewHolder(final VH holder, final int viewHolderPosition) {
 
 		final BinderResult result = computeItemAndBinderIndex(viewHolderPosition);
-		final Binder binder = result.getBinder();
+		final Binder binder = result.getBinder().get();
 
 		if (binder != null && result.item != null) {
 
@@ -238,9 +256,7 @@ public abstract class GraywaterAdapter<
 				prepare(viewHolderPosition, binder, result.item, result.binderList, result.binderIndex);
 			}
 
-			final ActionListener actionListener = mActionListenerMap.get(getModelType(result.item));
-
-			binder.bind(result.item, holder, result.binderList, result.binderIndex, actionListener);
+			binder.bind(result.item, holder, result.binderList, result.binderIndex, getActionListener(result.item));
 
 			prepareInternal(viewHolderPosition);
 			mPreviousBoundViewHolderPosition = viewHolderPosition;
@@ -264,7 +280,7 @@ public abstract class GraywaterAdapter<
 			final int viewHolderPosition = lastBoundViewHolderPosition + direction * i;
 			if (isViewHolderPositionWithinBounds(viewHolderPosition)) {
 				final BinderResult result = computeItemAndBinderIndex(viewHolderPosition);
-				final Binder binder = result.getBinder();
+				final Binder binder = result.getBinder().get();
 
 				if (binder != null && result.item != null) {
 					prepare(viewHolderPosition, binder, result.item, result.binderList, result.binderIndex);
@@ -275,13 +291,13 @@ public abstract class GraywaterAdapter<
 
 	/**
 	 * Calls {@link Binder#prepare(Object, List, int)}.
-
+	 *
 	 * @param viewHolderPosition
-	 *      the position of the viewholder.
+	 * 		the position of the viewholder.
 	 * @param binder
-	 *      the binder to call.
+	 * 		the binder to call.
 	 * @param model
-	 *      the model being prepared.
+	 * 		the model being prepared.
 	 * @param binderList
 	 * 		the list of binders
 	 * @param binderIndex
@@ -290,7 +306,7 @@ public abstract class GraywaterAdapter<
 	protected void prepare(final int viewHolderPosition,
 	                       final Binder<T, VH, ? extends VH> binder,
 	                       final T model,
-	                       final List<Binder<? super T, VH, ? extends VH>> binderList,
+	                       final List<Provider<Binder<? super T, VH, ? extends VH>>> binderList,
 	                       final int binderIndex) {
 		if (!mViewHolderPreparedCache.contains(viewHolderPosition)) {
 			binder.prepare(model, binderList, binderIndex);
@@ -307,10 +323,10 @@ public abstract class GraywaterAdapter<
 	}
 
 	/**
-	 *  Checks if the timeline position is within the bounds of the underlying List
+	 * Checks if the timeline position is within the bounds of the underlying List
 	 *
 	 * @param itemPosition
-	 *      timeline item position.
+	 * 		timeline item position.
 	 * @return true if within list bounds. False otherwise.
 	 */
 	protected boolean isItemPositionWithinBounds(final int itemPosition) {
@@ -321,7 +337,7 @@ public abstract class GraywaterAdapter<
 	 * Checks if the viewholder is within the bounds of underlying list.
 	 *
 	 * @param viewHolderPosition
-	 *      viewholder position
+	 * 		viewholder position
 	 * @return true of within list bound. False otherwise.
 	 */
 	protected boolean isViewHolderPositionWithinBounds(final int viewHolderPosition) {
@@ -354,7 +370,7 @@ public abstract class GraywaterAdapter<
 	}
 
 	/**
-	 * Adds the given item to the adapter and notifies the adapter.
+	 * Note that this does not notify.
 	 *
 	 * @param item
 	 * 		the item to add to the adapter.
@@ -389,11 +405,10 @@ public abstract class GraywaterAdapter<
 	}
 
 	/**
-	 *
 	 * @param itemIndex
-	 *      the current view holders binder position.
+	 * 		the current view holders binder position.
 	 * @param viewHolderPosition
-	 *      the view holder position.
+	 * 		the view holder position.
 	 * @return the binder index associated with view holder.
 	 */
 	public int getBinderPosition(final int itemIndex, final int viewHolderPosition) {
@@ -413,7 +428,7 @@ public abstract class GraywaterAdapter<
 	public void add(final int position, @NonNull final T item, final boolean notify) {
 		final int numViewHolders = getViewHolderCount(position);
 
-		final List<Binder<? super T, VH, ? extends VH>> binders = getParts(item, position);
+		final List<Provider<Binder<? super T, VH, ? extends VH>>> binders = getParts(item, position);
 
 		mItems.add(position, item);
 		mBinderListCache.add(position, binders);
@@ -474,11 +489,11 @@ public abstract class GraywaterAdapter<
 
 			item = mItems.get(itemPosition);
 
-			final List<? extends Binder<? super T, VH, ? extends VH>> binders = mBinderListCache.get(itemPosition);
+			final List<Provider<Binder<? super T, VH, ? extends VH>>> binders = mBinderListCache.get(itemPosition);
 
 			mItems.remove(itemPosition);
 
-			for (final ListIterator<Integer> iter = mViewHolderToItemPositionCache.listIterator(); iter.hasNext();) {
+			for (final ListIterator<Integer> iter = mViewHolderToItemPositionCache.listIterator(); iter.hasNext(); ) {
 				if (iter.next() == itemPosition) {
 					iter.remove();
 				}
@@ -517,18 +532,18 @@ public abstract class GraywaterAdapter<
 	 * @param itemPosition
 	 * 		the position for the item that uses the view holder.
 	 * @param viewHolderClass
-	 *      the view holder type to look for.
+	 * 		the view holder type to look for.
 	 * @return the adapter data position for the view holder, or -1 if not found.
 	 */
 	public int getFirstViewHolderPosition(final int itemPosition, @NonNull final Class<? extends VH> viewHolderClass) {
 		if (isItemPositionWithinBounds(itemPosition) && mViewHolderClassToViewTypeMap.containsKey(viewHolderClass)) {
 			final int itemStartPos = getViewHolderCount(itemPosition);
 			int viewHolderIndex = 0;
-			final List<Binder<? super T, VH, ? extends VH>> binders = mBinderListCache.get(itemPosition);
+			final List<Provider<Binder<? super T, VH, ? extends VH>>> binders = mBinderListCache.get(itemPosition);
 			final int viewType = mViewHolderClassToViewTypeMap.get(viewHolderClass);
 			final T item = mItems.get(itemPosition);
-			for (Binder<? super T, VH, ? extends VH> binder : binders) {
-				if (binder.getViewType(item) == viewType) {
+			for (Provider<Binder<? super T, VH, ? extends VH>> binder : binders) {
+				if (binder.get().getViewType(item) == viewType) {
 					return itemStartPos + viewHolderIndex;
 				}
 				viewHolderIndex++;
@@ -579,7 +594,7 @@ public abstract class GraywaterAdapter<
 	protected void onViewRecycled(final VH holder, final int viewHolderPosition) {
 		if (isViewHolderPositionWithinBounds(viewHolderPosition)) {
 			final BinderResult result = computeItemAndBinderIndex(viewHolderPosition);
-			final Binder binder = result.getBinder();
+			final Binder binder = result.getBinder().get();
 
 			if (binder != null) {
 				mViewHolderPreparedCache.remove(viewHolderPosition);
@@ -588,7 +603,6 @@ public abstract class GraywaterAdapter<
 					binder.unbind(holder);
 				}
 			}
-			// N.B. this fails when remove() is called (note that the item is gone)
 		}
 	}
 
@@ -603,8 +617,8 @@ public abstract class GraywaterAdapter<
 	 * @return the binders that belong to the item at the given position.
 	 */
 	@Nullable
-	public List<Binder<? super T, VH, ? extends VH>> getBindersForPosition(final int itemPosition) {
-		final List<Binder<? super T, VH, ? extends VH>> binders;
+	public List<Provider<Binder<? super T, VH, ? extends VH>>> getBindersForPosition(final int itemPosition) {
+		final List<Provider<Binder<? super T, VH, ? extends VH>>> binders;
 
 		if (isItemPositionWithinBounds(itemPosition)) {
 			binders = mBinderListCache.get(itemPosition);
@@ -627,7 +641,7 @@ public abstract class GraywaterAdapter<
 		if (isItemPositionWithinBounds(itemPosition)) {
 			final int numViewHolders = getViewHolderCount(itemPosition);
 
-			final List<Binder<? super T, VH, ? extends VH>> binders = mBinderListCache.get(itemPosition);
+			final List<Provider<Binder<? super T, VH, ? extends VH>>> binders = mBinderListCache.get(itemPosition);
 
 			range = new Pair<>(numViewHolders, binders.size());
 		} else {
@@ -668,7 +682,7 @@ public abstract class GraywaterAdapter<
 		 * @param binderIndex
 		 * 		the index of the binder in the list of binders.
 		 */
-		void prepare(@NonNull U model, @NonNull List<Binder<? super U, V, ? extends V>> binderList, int binderIndex);
+		void prepare(@NonNull U model, List<Provider<Binder<? super U, V, ? extends V>>> binderList, int binderIndex);
 
 		/**
 		 * Called when {@link android.support.v7.widget.RecyclerView.Adapter#onBindViewHolder(RecyclerView.ViewHolder,
@@ -686,8 +700,8 @@ public abstract class GraywaterAdapter<
 		 * @param actionListener
 		 * 		the action listener to use
 		 */
-		void bind(@NonNull U model, @NonNull W holder, @NonNull List<Binder<? super U, V, ? extends V>> binderList,
-		          int binderIndex, @NonNull ActionListener<U, V, W> actionListener);
+		void bind(@NonNull U model, @NonNull W holder, @NonNull List<Provider<Binder<? super U, V, ? extends V>>> binderList,
+		          int binderIndex, @Nullable ActionListener<U, V, W> actionListener);
 
 		/**
 		 * Called when {@link android.support.v7.widget.RecyclerView.Adapter#onViewRecycled(RecyclerView.ViewHolder)}
@@ -729,7 +743,7 @@ public abstract class GraywaterAdapter<
 	 * @param <V>
 	 * 		the viewholder type.
 	 * @param <B>
-	 *      the binder type.
+	 * 		the binder type.
 	 */
 	public interface ItemBinder<U, V extends RecyclerView.ViewHolder, B extends GraywaterAdapter.Binder<U, V, ? extends V>> {
 		/**
@@ -740,7 +754,7 @@ public abstract class GraywaterAdapter<
 		 * @return the list of binders to use.
 		 */
 		@NonNull
-		List<B> getBinderList(@NonNull U model, int position);
+		List<Provider<? extends B>> getBinderList(@NonNull U model, int position);
 	}
 
 	/**
@@ -767,7 +781,7 @@ public abstract class GraywaterAdapter<
 		 * 		an extra object for message passing.
 		 */
 		void act(@NonNull U model, @NonNull W holder, @NonNull View v,
-		         @NonNull List<Binder<? super U, V, ? extends V>> binderList,
+		         @NonNull List<Provider<Binder<? super U, V, ? extends V>>> binderList,
 		         int binderIndex, @Nullable Object obj);
 	}
 
@@ -797,7 +811,7 @@ public abstract class GraywaterAdapter<
 		/**
 		 * The list of binders.
 		 */
-		public List<Binder<? super U, V, ? extends V>> binders;
+		public List<Provider<Binder<? super U, V, ? extends V>>> binders;
 		/**
 		 * The index into the list of binders.
 		 */
@@ -828,7 +842,7 @@ public abstract class GraywaterAdapter<
 		 */
 		public void update(final ActionListener<U, V, W> actionListener,
 		                   @NonNull final U model, @NonNull final W holder,
-		                   @NonNull final List<Binder<? super U, V, ? extends V>> binders, final int binderIndex,
+		                   @NonNull final List<Provider<Binder<? super U, V, ? extends V>>> binders, final int binderIndex,
 		                   @Nullable final Object obj) {
 			this.model = model;
 			this.holder = holder;
@@ -863,7 +877,7 @@ public abstract class GraywaterAdapter<
 		 * The list of binders associated with the item.
 		 */
 		@Nullable
-		public final List<Binder<? super T, VH, ? extends VH>> binderList;
+		public final List<Provider<Binder<? super T, VH, ? extends VH>>> binderList;
 		/**
 		 * The index of the binder to use in the list of binders.
 		 */
@@ -881,7 +895,7 @@ public abstract class GraywaterAdapter<
 		 */
 		BinderResult(@Nullable final T item,
 		             final int itemPosition,
-		             @Nullable final List<Binder<? super T, VH, ? extends VH>> binderList,
+		             @Nullable final List<Provider<Binder<? super T, VH, ? extends VH>>> binderList,
 		             final int binderIndex) {
 			this.item = item;
 			this.itemPosition = itemPosition;
@@ -893,7 +907,7 @@ public abstract class GraywaterAdapter<
 		 * @return the binder to use.
 		 */
 		@Nullable
-		public Binder<? super T, VH, ? extends VH> getBinder() {
+		public Provider<Binder<? super T, VH, ? extends VH>> getBinder() {
 			return binderList != null && binderIndex >= 0 && binderIndex < binderList.size()
 					? binderList.get(binderIndex) : null;
 		}

@@ -1,6 +1,7 @@
 package com.tumblr.example.binder;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.view.View;
 import android.widget.Toast;
 import com.tumblr.example.R;
@@ -9,12 +10,19 @@ import com.tumblr.example.viewholder.ColorPrimitiveViewHolder;
 import com.tumblr.example.viewholder.PrimitiveViewHolder;
 import com.tumblr.graywater.GraywaterAdapter;
 
+import javax.inject.Inject;
+import javax.inject.Provider;
 import java.util.List;
 
 /**
  * Created by ericleong on 3/13/16.
  */
-public class PaletteColorBinder implements GraywaterAdapter.Binder<Palette,PrimitiveViewHolder,ColorPrimitiveViewHolder> {
+public class PaletteColorBinder implements GraywaterAdapter.Binder<Palette, PrimitiveViewHolder, ColorPrimitiveViewHolder> {
+
+	@Inject
+	public PaletteColorBinder() {
+
+	}
 
 	@Override
 	public int getViewType(final Palette model) {
@@ -23,8 +31,8 @@ public class PaletteColorBinder implements GraywaterAdapter.Binder<Palette,Primi
 
 	@Override
 	public void prepare(@NonNull final Palette model,
-	                    @NonNull final List<GraywaterAdapter.Binder<
-			                    ? super Palette, PrimitiveViewHolder, ? extends PrimitiveViewHolder>> binders,
+	                    final List<Provider<GraywaterAdapter.Binder<
+			                    ? super Palette, PrimitiveViewHolder, ? extends PrimitiveViewHolder>>> binderList,
 	                    final int binderIndex) {
 
 	}
@@ -32,10 +40,10 @@ public class PaletteColorBinder implements GraywaterAdapter.Binder<Palette,Primi
 	@Override
 	public void bind(@NonNull final Palette model,
 	                 @NonNull final ColorPrimitiveViewHolder holder,
-	                 @NonNull final List<GraywaterAdapter.Binder<
-			                 ? super Palette, PrimitiveViewHolder, ? extends PrimitiveViewHolder>> binders,
+	                 @NonNull final List<Provider<GraywaterAdapter.Binder<
+			                 ? super Palette, PrimitiveViewHolder, ? extends PrimitiveViewHolder>>> binderList,
 	                 final int binderIndex,
-	                 @NonNull final GraywaterAdapter.ActionListener<
+	                 @Nullable final GraywaterAdapter.ActionListener<
 			                 Palette, PrimitiveViewHolder, ColorPrimitiveViewHolder> actionListener) {
 		holder.getView().setBackgroundColor(holder.getView().getResources().getColor(model.getColors().get
 				(binderIndex - 1)));
